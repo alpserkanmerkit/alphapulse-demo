@@ -1,0 +1,46 @@
+# Configuration for quant-engine tooling (not a package: no [project]/[build-system]).
+# Rationale and sources: docs/test-temel/ajan3-quant.md
+
+[tool.pytest.ini_options]
+# Collect only under tests/; the code directories (models/, main.py) are not collected.
+testpaths = ["tests"]
+# Source modules (main, market_data, models.*) are imported from the quant-engine root.
+# https://docs.pytest.org/en/stable/explanation/goodpractices.html ("pythonpath" setting)
+pythonpath = ["."]
+# Import mode recommended for new projects: test file names need not be unique
+# and sys.path is not polluted with test directories.
+addopts = ["--import-mode=importlib"]
+
+[tool.coverage.run]
+branch = true
+source = ["."]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+# Measured source coverage is 99% (line+branch); dropping below this should turn red.
+fail_under = 90
+
+[tool.ruff]
+# Existing code contains lines longer than 120 characters; instead of E501 this is left
+# to the formatter (E501 is disabled below). Target version matches CI.
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+# Explicit starting set: pycodestyle E, Pyflakes F, isort I, bugbear B.
+# Ruff docs: "Prefer lint.select over lint.extend-select to make your rule set explicit."
+select = ["E", "F", "I", "B"]
+ignore = [
+  # Line length: 53 existing violations; disabled to avoid reformatting application code.
+  "E501",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# CI runs "python -m unittest discover quant-engine/tests"; the root directory must be added to
+# sys.path before imports, so E402 is expected in tests.
+"tests/*" = ["E402"]
+# Adding raise HTTPException(...) from e changes the traceback chain; even without a behavior
+# change, application code was not edited by hand in this task (finding is in the report).
+"main.py" = ["B904"]

@@ -1,0 +1,247 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("ANALYST")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  newsArchives    NewsArchive[]
+  debateHistories DebateHistory[]
+  portfolioStates  PortfolioState[]
+  teamMemberships  TeamMembership[]
+  auditEvents      AuditEvent[]
+  modelRuns        ModelRun[]
+  complianceChangeRequests ComplianceChangeRequest[] @relation("ComplianceRequestedBy")
+  complianceReviews        ComplianceChangeRequest[] @relation("ComplianceReviewedBy")
+}
+
+model Team {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships TeamMembership[]
+  portfolios  PortfolioState[]
+  auditEvents AuditEvent[]
+  modelRuns   ModelRun[]
+  restrictedSecurities ComplianceRestrictedSecurity[]
+  complianceAlerts     ComplianceAlertRecord[]
+  complianceChangeRequests ComplianceChangeRequest[]
+}
+
+model TeamMembership {
+  id        String   @id @default(uuid())
+  teamId    String
+  userId    String
+  role      String
+  createdAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@index([userId])
+}
+
+model NewsArchive {
+  id         String    @id @default(uuid())
+  userId     String?
+  user       User?     @relation(fields: [userId], references: [id])
+  headline   String
+  category   String
+  source     String
+  timestamp  DateTime  @default(now())
+  score      Float?
+  isAnalyzed Boolean   @default(false)
+  archived   Boolean   @default(false)
+  archivedAt DateTime?
+
+  @@index([userId])
+}
+
+model DebateHistory {
+  id              String    @id @default(uuid())
+  userId          String?
+  user            User?     @relation(fields: [userId], references: [id])
+  newsId          String
+  direction       String
+  confidence      Int
+  bullProbability Int
+  bearProbability Int
+  summary         String
+  createdAt       DateTime  @default(now())
+  archived        Boolean   @default(false)
+  archivedAt      DateTime?
+
+  @@index([userId])
+}
+
+model PortfolioState {
+  id           String   @id @default(uuid())
+  userId       String?
+  teamId       String?
+  user         User?    @relation(fields: [userId], references: [id])
+  team         Team?    @relation(fields: [teamId], references: [id])
+  totalBalance Float    @default(0)
+  cashBalance  Float    @default(0)
+  currentVaR   Float    @default(0)
+  updatedAt    DateTime @updatedAt
+
+  positions    Position[]
+  transactions Transaction[]
+
+  @@index([userId])
+  @@index([teamId])
+  @@unique([userId, teamId])
+}
+
+model ModelRun {
+  id            String   @id @default(uuid())
+  teamId        String?
+  actorId       String?
+  route         String
+  modelFamily   String
+  modelName     String?
+  promptVersion String?
+  inputHash     String
+  mode          String
+  outcome       String
+  failureStage  String?
+  durationMs    Int?
+  sourceCount   Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  team  Team? @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([teamId])
+  @@index([actorId])
+  @@index([route])
+  @@index([outcome])
+}
+
+model Position {
+  id               String         @id @default(uuid())
+  portfolioStateId String
+  portfolio        PortfolioState @relation(fields: [portfolioStateId], references: [id])
+  ticker           String
+  quantity         Float
+  averagePrice     Float
+  currentPrice     Float          @default(0)
+  updatedAt        DateTime       @updatedAt
+
+  @@index([portfolioStateId])
+  @@unique([portfolioStateId, ticker])
+}
+
+model Transaction {
+  id               String         @id @default(uuid())
+  portfolioStateId String
+  portfolio        PortfolioState @relation(fields: [portfolioStateId], references: [id])
+  ticker           String
+  type             String
+  quantity         Float
+  price            Float
+  commission       Float          @default(0)
+  timestamp        DateTime       @default(now())
+
+  @@index([portfolioStateId])
+}
+
+model AuditEvent {
+  id        String   @id @default(uuid())
+  timestamp DateTime @default(now())
+  category  String
+  action    String
+  actorId   String?
+  actorRole String?
+  actorName String?
+  teamId    String?
+  subject   String?
+  outcome   String
+  details   String?
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  team  Team? @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  @@index([timestamp])
+  @@index([category])
+  @@index([actorId])
+  @@index([teamId])
+}
+
+model ComplianceRestrictedSecurity {
+  id              String   @id @default(uuid())
+  teamId          String
+  ticker          String
+  name            String
+  reason          String
+  restrictedSince DateTime @default(now())
+  restrictedUntil DateTime?
+  addedById       String?
+  addedByName     String
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, ticker])
+  @@index([teamId, active])
+}
+
+model ComplianceAlertRecord {
+  id        String   @id
+  teamId    String
+  type      String
+  severity  String
+  message   String
+  timestamp DateTime
+  resolved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@index([teamId, resolved])
+}
+
+model ComplianceChangeRequest {
+  id              String   @id @default(uuid())
+  teamId          String
+  action          String
+  status          String   @default("PENDING")
+  ticker          String
+  name            String?
+  reason          String?
+  restrictedUntil DateTime?
+  requestedById   String
+  requestedByName String
+  requestedByRole String
+  reviewedById    String?
+  reviewedByName  String?
+  reviewNote      String?
+  createdAt       DateTime @default(now())
+  reviewedAt      DateTime?
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  requestedBy User @relation("ComplianceRequestedBy", fields: [requestedById], references: [id], onDelete: Restrict)
+  reviewedBy  User? @relation("ComplianceReviewedBy", fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([teamId, status])
+  @@index([requestedById])
+  @@index([reviewedById])
+}

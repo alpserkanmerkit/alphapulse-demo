@@ -1,0 +1,67 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Local env/secrets
+.env
+.env.*
+!.env.example
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Generated & temp files
+.agent/
+.gemini/
+tmp/
+reports/
+output/playwright/
+output/audit-events.jsonl
+test-results/
+prisma/*.db
+prisma/*.db-*
+workflows/
+!.github/workflows/
+!.github/workflows/*.yml
+system_truth.md
+system_truth.md.bak
+implementation_plan.md
+*.backup
+*.old
+*.bak
+*.tmp
+
+# Internal Codex/tooling - keep out of product GitHub snapshots
+.codex/
+.agents/
+plugins/alphapulse-codex-kit/
+brain/
+project-development-notes.md
+*.codex-note.md
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+*.egg-info/

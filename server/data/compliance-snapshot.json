@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "updatedAt": "2026-04-18T12:00:00.000Z",
+  "alerts": [
+    {
+      "id": "ca1",
+      "type": "CONCENTRATION_RISK",
+      "severity": "WARNING",
+      "message": "NVDA position weight (22%) exceeds 20% concentration threshold.",
+      "timestamp": 1776513300000,
+      "resolved": false
+    },
+    {
+      "id": "ca2",
+      "type": "VAR_BREACH",
+      "severity": "WARNING",
+      "message": "Portfolio VaR increased 35% after Fed statement. Current VaR: $12.4M (4.1% AUM).",
+      "timestamp": 1776512520000,
+      "resolved": false
+    },
+    {
+      "id": "ca3",
+      "type": "RESTRICTED_MATCH",
+      "severity": "CRITICAL",
+      "message": "News feed contained mention of XYZ Corp (Restricted). Alert: Fund Manager may have viewed restricted security analysis.",
+      "timestamp": 1776510900000,
+      "resolved": true
+    }
+  ],
+  "restricted": [
+    {
+      "ticker": "XYZ",
+      "name": "XYZ Corp",
+      "reason": "Active M&A Negotiation",
+      "restrictedSince": 1776081600000,
+      "addedBy": "Compliance Dept"
+    },
+    {
+      "ticker": "RIVAL",
+      "name": "Rival Bank Ltd",
+      "reason": "Conflict of Interest - Advisory Role",
+      "restrictedSince": 1773921600000,
+      "restrictedUntil": 1781697600000,
+      "addedBy": "Legal Dept"
+    },
+    {
+      "ticker": "GOV1",
+      "name": "Gov Bond Series A",
+      "reason": "Regulatory Review Pending",
+      "restrictedSince": 1776340800000,
+      "addedBy": "Risk Committee"
+    }
+  ],
+  "audit": [
+    {
+      "id": "a1",
+      "userId": "u1",
+      "userName": "Demo Fund Manager",
+      "action": "Viewed Deep Dive",
+      "category": "NEWS_VIEW",
+      "timestamp": 1776513480000,
+      "details": "Fed rate decision Deep Dive report",
+      "relatedNewsId": "n1"
+    },
+    {
+      "id": "a2",
+      "userId": "u1",
+      "userName": "Demo Fund Manager",
+      "action": "Initiated War Room Debate",
+      "category": "NEWS_VIEW",
+      "timestamp": 1776513120000,
+      "details": "Bitcoin ETF news debated in War Room",
+      "relatedNewsId": "n2"
+    },
+    {
+      "id": "a3",
+      "userId": "u2",
+      "userName": "Demo Compliance Officer",
+      "action": "Portfolio Weight Updated",
+      "category": "PORTFOLIO_CHANGE",
+      "timestamp": 1776512700000,
+      "details": "AAPL weight increased from 15% to 19%"
+    },
+    {
+      "id": "a4",
+      "userId": "u2",
+      "userName": "Demo Compliance Officer",
+      "action": "Hedge Strategy Simulated",
+      "category": "TRADE_ACTION",
+      "timestamp": 1776511680000,
+      "details": "PUT_BUY on QQQ evaluated for Q2 expiry"
+    },
+    {
+      "id": "a5",
+      "userId": "u3",
+      "userName": "Demo Risk Analyst",
+      "action": "System Login",
+      "category": "SYSTEM",
+      "timestamp": 1776510000000,
+      "details": "Login from 192.168.1.45",
+      "ipAddress": "192.168.1.45"
+    }
+  ]
+}
